@@ -1,0 +1,56 @@
+// Criar um usuario dentro do banco de dados
+POST http://localhost:8080/createUser
+Content-Type: application/json
+
+{
+  "email": "jose.jogo@gmail.com",
+  "nick_name": "JBohme",
+  "password": "123456",
+  "name": "José"
+}
+###
+
+// Realiza o login do usuário com email e senha
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "email": "jose.jogo@gmail.com",
+  "password": "123456"
+}
+###
+
+// Buscar usuário no banco de dados por email
+GET http://localhost:8080/getUserByEmail/jose.jogo@gmail.com
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Impvc2Uuam9nb0BnbWFpbC5jb20iLCJleHAiOjE3MzE2MzU4NDcsImlkIjoiNjczNTU3YTI2YzFlODExYTM4NzU0MTQzIiwibmFtZSI6Ikpvc8OpIiwibmlja19uYW1lIjoiSkJvaG1lIn0.Z32IKIPzvrjIs1kXb1Y_RBnFcY2fU2UAeROjBjFPSZI
+###
+
+// Buscar usuário no banco de dados por email
+GET http://localhost:8080/getUserById/673557a26c1e811a38754143
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Impvc2Uuam9nb0BnbWFpbC5jb20iLCJleHAiOjE3MzE2MzU4NDcsImlkIjoiNjczNTU3YTI2YzFlODExYTM4NzU0MTQzIiwibmFtZSI6Ikpvc8OpIiwibmlja19uYW1lIjoiSkJvaG1lIn0.Z32IKIPzvrjIs1kXb1Y_RBnFcY2fU2UAeROjBjFPSZI
+###
+
+// Buscar usuário no banco de dados por email
+GET http://localhost:8080/JoinRandomRoom
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Impvc2Uuam9nb0BnbWFpbC5jb20iLCJleHAiOjE3MzE2MzU4NDcsImlkIjoiNjczNTU3YTI2YzFlODExYTM4NzU0MTQzIiwibmFtZSI6Ikpvc8OpIiwibmlja19uYW1lIjoiSkJvaG1lIn0.Z32IKIPzvrjIs1kXb1Y_RBnFcY2fU2UAeROjBjFPSZI
+###
+
+// Atualiza um usuario já criado dentro do banco de dados
+PUT http://localhost:8080/updateUser/673557a26c1e811a38754143
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Impvc2Uuam9nb0BnbWFpbC5jb20iLCJleHAiOjE3MzE2MzU4NDcsImlkIjoiNjczNTU3YTI2YzFlODExYTM4NzU0MTQzIiwibmFtZSI6Ikpvc8OpIiwibmlja19uYW1lIjoiSkJvaG1lIn0.Z32IKIPzvrjIs1kXb1Y_RBnFcY2fU2UAeROjBjFPSZI
+
+{
+  "name": "José Bohme castro",
+  "nick_name": "jobohme"
+}
+###
+
+// Apaga um usuário do banco de dados dado um userId
+DELETE http://localhost:8080/deleteUser/673557a26c1e811a38754143
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Impvc2Uuam9nb0BnbWFpbC5jb20iLCJleHAiOjE3MzE2MzU4NDcsImlkIjoiNjczNTU3YTI2YzFlODExYTM4NzU0MTQzIiwibmFtZSI6Ikpvc8OpIiwibmlja19uYW1lIjoiSkJvaG1lIn0.Z32IKIPzvrjIs1kXb1Y_RBnFcY2fU2UAeROjBjFPSZI
+###

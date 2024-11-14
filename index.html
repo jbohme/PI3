@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Velha 2</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .success {
+            color: green;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .error-message {
+            list-style: none;
+            padding-left: 0;
+        }
+        .error-message li {
+            color: red;
+        }
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .form-container {
+            margin-bottom: 30px;
+        }
+        .user-info {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .user-info h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Login Form -->
+    <div class="form-container" id="loginFormContainer">
+        <h1>Login</h1>
+        <form id="loginForm">
+            <div class="form-group">
+                <input type="text" id="loginEmail" placeholder="Email" required />
+            </div>
+            <div class="form-group">
+                <input type="password" id="loginPassword" placeholder="Password" required />
+            </div>
+            <button type="submit">Entrar</button>
+            <div id="loginErrorContainer" class="error-message"></div>
+            <div id="loginSuccessContainer" class="success"></div>
+        </form>
+        <div class="nav-buttons">
+            <button id="goToRegisterBtn">Criar Conta</button>
+        </div>
+    </div>
+
+    <!-- Register Form -->
+    <div class="form-container" id="registerFormContainer" style="display: none;">
+        <h1>Cadastrar</h1>
+        <form id="registerForm">
+            <div class="form-group">
+                <input type="text" id="registerName" placeholder="Nome Completo" required />
+            </div>
+            <div class="form-group">
+                <input type="text" id="registerNickName" placeholder="Apelido" required />
+            </div>
+            <div class="form-group">
+                <input type="email" id="registerEmail" placeholder="Email" required />
+            </div>
+            <div class="form-group">
+                <input type="password" id="registerPassword" placeholder="Senha" required />
+            </div>
+            <button type="submit">Cadastrar</button>
+            <div id="registerErrorContainer" class="error-message"></div>
+        </form>
+        <div class="nav-buttons">
+            <button id="goToLoginBtn">Já tenho conta</button>
+        </div>
+    </div>
+
+    <!-- Match Search -->
+    <div class="form-container" id="matchSearchContainer" style="display: none;">
+        <h1>Bem-vindo, <span id="userNameDisplay"></span></h1>
+        <div class="user-info">
+            <h3>Dados do Usuário:</h3>
+            <p><strong>Nome:</strong> <span id="userRealNameDisplay"></span></p>
+            <p><strong>Email:</strong> <span id="userEmailDisplay"></span></p>
+            <p><strong>Vitórias:</strong> <span id="userWinsDisplay"></span></p>
+        </div>
+        <h2>Buscar Partidas</h2>
+        <button id="createRandomMatchBtn">Buscar</button>
+
+        <div class="nav-buttons">
+            <button id="goToLoginFromMatch">Voltar ao Login</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let socket; // Variável para armazenar a conexão WebSocket
+
+    let loggedInUser = null; // Simulando um usuário logado para fins de exemplo
+
+    function connectWebSocket() {
+        // Substitua pelo endereço do seu servidor WebSocket
+        socket = new WebSocket('ws://localhost:8080/JoinRandomRoom');
+
+        socket.onopen = () => {
+            console.log("Conexão WebSocket estabelecida!");
+        };
+
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            handleServerMessage(data);
+        };
+
+        socket.onerror = (error) => {
+            console.error("Erro na conexão WebSocket:", error);
+        };
+
+        socket.onclose = () => {
+            console.log("Conexão WebSocket fechada!");
+        };
+    }
+
+    function handleServerMessage(data) {
+        if (data.type === 'room_created') {
+            // Se o servidor respondeu com uma sala criada, exibe o código da sala
+            alert(`Sala criada! Código da sala: ${data.roomCode}`);
+            // Você pode também atualizar a interface para mostrar a sala e seus jogadores
+        } else if (data.type === 'error') {
+            alert(`Erro: ${data.message}`);
+        }
+    }
+
+
+
+    // Limpar erros ao mudar de tela
+    function clearErrors() {
+        document.getElementById('loginErrorContainer').innerHTML = '';
+        document.getElementById('registerErrorContainer').innerHTML = '';
+        document.getElementById('loginSuccessContainer').innerHTML = '';
+    }
+
+    // Handle showing the correct form based on user interaction
+    document.getElementById('goToRegisterBtn').addEventListener('click', () => {
+        clearErrors();  // Limpar erros ao trocar de tela
+        document.getElementById('loginFormContainer').style.display = 'none';
+        document.getElementById('registerFormContainer').style.display = 'block';
+    });
+
+    document.getElementById('goToLoginBtn').addEventListener('click', () => {
+        clearErrors();  // Limpar erros ao trocar de tela
+        document.getElementById('registerFormContainer').style.display = 'none';
+        document.getElementById('loginFormContainer').style.display = 'block';
+    });
+
+    // Handle login form submission
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        const errorContainer = document.getElementById('loginErrorContainer');
+        const successContainer = document.getElementById('loginSuccessContainer');
+        errorContainer.innerHTML = '';
+        successContainer.innerHTML = '';
+
+        try {
+            const response = await fetch('http://localhost:8080/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                let errorMessages = '';
+                result.causes.forEach(cause => {
+                    errorMessages += `<li><strong>${cause.field}:</strong> ${cause.message}</li>`;
+                });
+                errorContainer.innerHTML = `<ul>${errorMessages}</ul>`;
+            } else {
+                console.log(result)
+                // Simulando um usuário logado
+                loggedInUser = result;
+                displayUserData();
+                document.getElementById('loginFormContainer').style.display = 'none';
+                document.getElementById('matchSearchContainer').style.display = 'block';
+            }
+        } catch (error) {
+            console.log(error)
+            errorContainer.innerHTML = 'Erro na requisição. Tente novamente.';
+        }
+    });
+
+    // Handle register form submission
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('registerName').value;
+        const nickName = document.getElementById('registerNickName').value;
+        const email = document.getElementById('registerEmail').value;
+        const password = document.getElementById('registerPassword').value;
+        const errorContainer = document.getElementById('registerErrorContainer');
+        errorContainer.innerHTML = '';
+
+        try {
+            const response = await fetch('http://localhost:8080/createUser', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, nick_name: nickName, email, password })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                let errorMessages = '';
+                result.causes.forEach(cause => {
+                    errorMessages += `<li><strong>${cause.field}:</strong> ${cause.message}</li>`;
+                });
+                errorContainer.innerHTML = `<ul>${errorMessages}</ul>`;
+            } else {
+                alert('Conta criada com sucesso! Faça login.');
+                document.getElementById('registerFormContainer').style.display = 'none';
+                document.getElementById('loginFormContainer').style.display = 'block';
+            }
+        } catch (error) {
+            errorContainer.innerHTML = 'Erro na requisição. Tente novamente.';
+        }
+    });
+
+    // Display user data after successful login
+    function displayUserData() {
+        document.getElementById('userRealNameDisplay').textContent = loggedInUser.name;
+        document.getElementById('userNameDisplay').textContent = loggedInUser.nick_name;
+        document.getElementById('userEmailDisplay').textContent = loggedInUser.email;
+        document.getElementById('userWinsDisplay').textContent = loggedInUser.qty_wins;
+    }
+
+    // Criar sala aleatória
+    document.getElementById('createRandomMatchBtn').addEventListener('click', () => {
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+            alert('Conexão com o servidor WebSocket não estabelecida!');
+            return;
+        }
+        // Envia um comando para o servidor criar uma sala aleatória
+        const request = {
+            type: 'create_random_room',
+            userId: loggedInUser.id // O ID do jogador logado
+        };
+        socket.send(JSON.stringify(request));
+    });
+
+    // Conectar ao servidor WebSocket assim que a página for carregada
+    window.onload = () => {
+        connectWebSocket();
+    };
+
+
+    // Handle logout and going back to login
+    document.getElementById('goToLoginFromMatch').addEventListener('click', () => {
+        loggedInUser = null;
+        document.getElementById('matchSearchContainer').style.display = 'none';
+        document.getElementById('loginFormContainer').style.display = 'block';
+    });
+</script>
+
+</body>
+</html>
